@@ -1,11 +1,11 @@
 {
-  "name": "hutsi/yii2-zendesk",
+  "name": "mirocow/yii2-zendesk",
   "description": "Yii2 zendesk plugin",
   "type": "extension",
   "license": "GPL-v3",
   "support": {
-    "issues": "https://github.com/hutsi/yii2-zendesk",
-    "source": "https://github.com/hutsi/yii2-zendesk"
+    "issues": "https://github.com/mirocow/yii2-zendesk",
+    "source": "https://github.com/mirocow/yii2-zendesk"
   },
   "minimum-stability": "dev",
   "require": {
@@ -15,7 +15,7 @@
   },
   "autoload": {
     "psr-4": {
-      "hutsi\\zendesk\\": ""
+      "mirocow\\zendesk\\": ""
     }
   }
 }
