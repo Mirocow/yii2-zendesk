@@ -32,14 +32,12 @@ class Client extends Component
         if (!$this->httpClient) {
             $client = new \GuzzleHttp\Client([
                 'base_url' => $this->baseUrl,
-                'defaults' => [
-                    'verify' => false,
-                    'auth'  => $this->getAuthSettings(),
-                    'headers' => [
-                        'Content-Type' => 'application/json'
-                    ],
-                    'debug' => YII_DEBUG
-                ]
+                'verify' => false,
+                'auth'  => $this->getAuthSettings(),
+                'headers' => [
+                  'Content-Type' => 'application/json'
+                ],
+                'debug' => YII_DEBUG
             ]);
 
             $this->httpClient = new \understeam\httpclient\Client([
