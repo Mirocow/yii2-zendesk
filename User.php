@@ -1,6 +1,6 @@
 <?php
 
-namespace hutsi\zendesk;
+namespace mirocow\zendesk;
 
 use Yii;
 use yii\base\Model;
@@ -8,7 +8,7 @@ use yii\base\Model;
 /**
  * Class User
  * @author Derushev Aleksey <derushev.alexey@gmail.com>
- * @package hutsi\zendesk
+ * @package mirocow\zendesk
  * https://developer.zendesk.com/rest_api/docs/core/users
  */
 class User extends Model

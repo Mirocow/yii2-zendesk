@@ -1,6 +1,6 @@
 <?php
 
-namespace hutsi\zendesk;
+namespace mirocow\zendesk;
 
 use Yii;
 use yii\base\Exception;
@@ -10,7 +10,7 @@ use yii\helpers\Json;
 /**
  * Class Attachment
  * @author Derushev Aleksey <derushev.alexey@gmail.com>
- * @package hutsi\zendesk
+ * @package mirocow\zendesk
  * https://developer.zendesk.com/rest_api/docs/core/attachments
  */
 class Attachment extends Model

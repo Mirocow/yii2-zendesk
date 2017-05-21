@@ -1,6 +1,6 @@
 <?php
 
-namespace hutsi\zendesk;
+namespace mirocow\zendesk;
 
 use Yii;
 use yii\base\Component;
@@ -8,7 +8,7 @@ use yii\base\Component;
 /**
  * Class Client
  * @author Derushev Aleksey <derushev.alexey@gmail.com>
- * @package hutsi\zendesk
+ * @package mirocow\zendesk
  * based on manual: https://support.zendesk.com/hc/en-us/articles/203691216
  */
 class Client extends Component
@@ -57,7 +57,7 @@ class Client extends Component
                 return [$this->user, $this->password, $this->authType];
                 break;
             case 'digest':
-                return [$this->user . '/token', $this->apiKey, $this->authType];
+                return [$this->user . '/token', $this->apiKey, 'basic'];
                 break;
             default:
                 $result = [];

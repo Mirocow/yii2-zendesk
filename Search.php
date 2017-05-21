@@ -1,6 +1,6 @@
 <?php
 
-namespace hutsi\zendesk;
+namespace mirocow\zendesk;
 
 use Yii;
 use yii\base\Model;
@@ -9,7 +9,7 @@ use yii\helpers\ArrayHelper;
 /**
  * Class Search
  * @author Derushev Aleksey <derushev.alexey@gmail.com>
- * @package hutsi\zendesk
+ * @package mirocow\zendesk
  * https://developer.zendesk.com/rest_api/docs/core/search
  */
 class Search extends Model
