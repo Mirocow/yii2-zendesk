@@ -4,20 +4,50 @@ namespace mirocow\zendesk;
 
 use Yii;
 use yii\base\Component;
+use yii\helpers\Json;
 
 /**
  * Class Client
  * @author Derushev Aleksey <derushev.alexey@gmail.com>
+ * @author Mirocow <mr.mirocow@gmail.com>
  * @package mirocow\zendesk
  * based on manual: https://support.zendesk.com/hc/en-us/articles/203691216
  */
 class Client extends Component
 {
+    const METHOD_GET = 'GET';
+    const METHOD_POST = 'POST';
+    const METHOD_PUT = 'PUT';
+    const METHOD_DELETE = 'DELETE';
+
     public $apiKey;
     public $user;
     public $baseUrl;
     public $password;
     public $authType;
+    public $debug;
+    public $cache;
+    public $useCache = true;
+
+    /**
+     * @var integer the number of seconds in which the cached value will expire. 0 means never expire.
+     */
+    public $cacheExpire = 15;
+
+    /**
+     * @var $ticketClass Ticket
+     */
+    public $ticketClass;
+
+    /**
+     * @var $commentClass Comment
+     */
+    public $commentClass;
+
+    /**
+     * @var $userClass User
+     */
+    public $userClass;
 
     /**
      * @var $httpClient \GuzzleHttp\Client
@@ -29,6 +59,15 @@ class Client extends Component
      */
     public function init()
     {
+        if(empty($this->ticketClass))
+            $this->ticketClass = Ticket::className();
+
+        if(empty($this->commentClass))
+            $this->commentClass = Comment::className();
+
+        if(empty($this->userClass))
+            $this->userClass = User::className();
+
         if (!$this->httpClient) {
             $client = new \GuzzleHttp\Client([
                 'base_url' => $this->baseUrl,
@@ -37,7 +76,7 @@ class Client extends Component
                 'headers' => [
                   'Content-Type' => 'application/json'
                 ],
-                'debug' => YII_DEBUG
+                'debug' => isset($this->debug)? $this->debug: YII_DEBUG
             ]);
 
             $this->httpClient = new \understeam\httpclient\Client([
@@ -77,7 +116,27 @@ class Client extends Component
     public function execute($method, $requestUrl, $options = [])
     {
         try {
-            return $this->httpClient->request($method, $this->baseUrl . $requestUrl, null, $options);
+
+            if($method == self::METHOD_GET && $this->useCache) {
+                if ($this->cache && Yii::$app->get($this->cache)) {
+                    /** @var $cache \yii\caching\Cache */
+                    $cache    = Yii::$app->get($this->cache);
+                    $cacheKey = md5($requestUrl . Json::encode($options));
+                    $response = $cache->get('Zendesk.response.' . $cacheKey);
+                    if (!empty($response)) {
+                        return $response;
+                    }
+                }
+            }
+
+            $response = $this->httpClient->request($method, $this->baseUrl . $requestUrl, null, $options);
+
+            if (isset($cache)) {
+                $cache->set('Zendesk.response.' . $cacheKey, $response, $this->cacheExpire);
+            }
+
+            return $response;
+
         }
         catch(\Exception $e) {
             throw $e;
@@ -92,7 +151,7 @@ class Client extends Component
      */
     public function get($requestUrl, $options = [])
     {
-        return $this->execute('GET', $requestUrl, $options);
+        return $this->execute(self::METHOD_GET, $requestUrl, $options);
     }
 
     /**
@@ -102,7 +161,7 @@ class Client extends Component
      */
     public function post($requestUrl, $options = [])
     {
-        return $this->execute('POST', $requestUrl, $options);
+        return $this->execute(self::METHOD_POST, $requestUrl, $options);
     }
 
     /**
@@ -112,7 +171,7 @@ class Client extends Component
      */
     public function put($requestUrl, $options = [])
     {
-        return $this->execute('PUT', $requestUrl, $options);
+        return $this->execute(self::METHOD_PUT, $requestUrl, $options);
     }
 
     /**
@@ -122,6 +181,6 @@ class Client extends Component
      */
     public function delete($requestUrl, $options = [])
     {
-        return $this->execute('DELETE', $requestUrl, $options);
+        return $this->execute(self::METHOD_DELETE, $requestUrl, $options);
     }
 }

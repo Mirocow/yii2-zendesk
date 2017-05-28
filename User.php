@@ -2,17 +2,23 @@
 
 namespace mirocow\zendesk;
 
+use mirocow\zendesk\common\baseModel;
 use Yii;
 use yii\base\Model;
 
 /**
  * Class User
  * @author Derushev Aleksey <derushev.alexey@gmail.com>
+ * @author Mirocow <mr.mirocow@gmail.com>
  * @package mirocow\zendesk
  * https://developer.zendesk.com/rest_api/docs/core/users
  */
-class User extends Model
+class User extends baseModel
 {
+    const ROLE_USER = 'end-user';
+    const ROLE_ADMIN = 'admin';
+    const ROLE_AGENT = 'agent';
+
     public $id;
     public $url;
     public $name;
@@ -26,6 +32,7 @@ class User extends Model
     public $verified;
     public $email;
     public $phone;
+    public $photo = [];
 
     public function rules()
     {
@@ -39,10 +46,11 @@ class User extends Model
             [['name'], 'required'],
             [['name', 'time_zone', 'locale', 'phone'], 'string'],
             [['locale_id', 'organization_id', 'id'], 'integer'],
-
             ['url', 'url'],
             ['role', 'default', 'value' => 'end-user'],
-
+            [['photo'], function($attribute) {
+                return is_array($this->$attribute);
+            }],
         ];
     }
 

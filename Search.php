@@ -9,6 +9,7 @@ use yii\helpers\ArrayHelper;
 /**
  * Class Search
  * @author Derushev Aleksey <derushev.alexey@gmail.com>
+ * @author Mirocow <mr.mirocow@gmail.com>
  * @package mirocow\zendesk
  * https://developer.zendesk.com/rest_api/docs/core/search
  */
@@ -19,6 +20,9 @@ class Search extends Model
     const TYPE_ORGANIZATION = 'organization';
     const TYPE_GROUP = 'group';
     const TYPE_TOPIC = 'topic';
+
+    const SORT_ASC = 'asc';
+    const SORT_DESC = 'desc';
 
     public $query;
     public $type;
@@ -33,18 +37,24 @@ class Search extends Model
                 return is_array($this->$attribute);
             }],
             [['sort_by'], 'string'],
-            [['sort_order'], 'in', 'range' => [SORT_ASC, SORT_DESC]],
+            [['sort_order'], 'in', 'range' => [self::SORT_ASC, self::SORT_DESC]],
         ];
     }
 
+    /**
+     * @return array|bool
+     */
     public function find()
     {
         if ($this->validate()) {
-            $httpQuery = http_build_query(ArrayHelper::merge($this->query, $this->getAttributes(['type', 'sort_by', 'sort_order'])));
-            $zendeskQuery = strtr($httpQuery, ['=' => ':', '&' => ' ']);
-
-            $response = Yii::$app->zendesk->get('/search.json', ['query' => ['query' => urldecode($zendeskQuery)]]);
-
+            $query = [];
+            if(is_array($this->query)) {
+                $query['query'] = urldecode(strtr(http_build_query($this->query), ['=' => ':', '&' => ' ']));
+            } else {
+                $query['query'] = $this->query;
+            }
+            $query = ArrayHelper::merge($query, $this->getAttributes(['type', 'sort_by', 'sort_order']));
+            $response = Yii::$app->zendesk->get('/search.json', ['query' => $query]);
             return isset($response['results']) ? $response['results'] : [];
 
         }
@@ -55,7 +65,7 @@ class Search extends Model
 
     /**
      * Searches for the user
-     * @return mixed
+     * @return array
      */
     public function users()
     {
@@ -64,13 +74,34 @@ class Search extends Model
         $zUsers = [];
         if ($results = $this->find()) {
             foreach ($results as $userData) {
-                $user = new User();
-                $userFields = array_intersect_key($userData, $user->getAttributes());
-                $user->setAttributes($userFields);
+                /** @var User $user */
+                $user = new Yii::$app->zendesk->userClass();
+                $user->load($userData);
                 $zUsers[] = $user;
             }
         }
 
         return $zUsers;
+    }
+
+    /**
+     * Searches for the ticket
+     * @return array
+     */
+    public function tickets()
+    {
+        $this->setAttributes(ArrayHelper::merge($this->getAttributes(), ['type' => 'ticket']));
+
+        $zTickets = [];
+        if ($results = $this->find()) {
+            foreach ($results as $ticketData) {
+                /** @var Ticket $ticket */
+                $ticket = new Yii::$app->zendesk->ticketClass;
+                $ticket->load($ticketData);
+                $zTickets[] = $ticket;
+            }
+        }
+
+        return $zTickets;
     }
 }
