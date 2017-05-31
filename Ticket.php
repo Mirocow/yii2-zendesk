@@ -113,9 +113,18 @@ class Ticket extends baseModel
     /**
      * @return mixed
      */
-    public function getComments()
+    public function getComments($orderBy = [])
     {
-        $results = Yii::$app->zendesk->get('/tickets/'.$this->id.'/comments.json');
+        if(!$orderBy){
+            $orderBy = [
+              'sort_by' => 'created_at',
+              'sort_order' => Search::SORT_DESC,
+            ];
+        }
+
+        $results = Yii::$app->zendesk->get('/tickets/'.$this->id.'/comments.json', [
+          'query' => $orderBy,
+        ]);
 
         $zComments = [];
         if (isset($results['comments'])) {

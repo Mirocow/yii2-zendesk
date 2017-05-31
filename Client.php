@@ -32,7 +32,7 @@ class Client extends Component
     /**
      * @var integer the number of seconds in which the cached value will expire. 0 means never expire.
      */
-    public $cacheExpire = 15;
+    public $cacheExpire = 30;
 
     /**
      * @var $ticketClass Ticket
@@ -115,33 +115,7 @@ class Client extends Component
      */
     public function execute($method, $requestUrl, $options = [])
     {
-        try {
-
-            if($method == self::METHOD_GET && $this->useCache) {
-                if ($this->cache && Yii::$app->get($this->cache)) {
-                    /** @var $cache \yii\caching\Cache */
-                    $cache    = Yii::$app->get($this->cache);
-                    $cacheKey = md5($requestUrl . Json::encode($options));
-                    $response = $cache->get('Zendesk.response.' . $cacheKey);
-                    if (!empty($response)) {
-                        return $response;
-                    }
-                }
-            }
-
-            $response = $this->httpClient->request($method, $this->baseUrl . $requestUrl, null, $options);
-
-            if (isset($cache)) {
-                $cache->set('Zendesk.response.' . $cacheKey, $response, $this->cacheExpire);
-            }
-
-            return $response;
-
-        }
-        catch(\Exception $e) {
-            throw $e;
-        }
-
+        return $this->httpClient->request($method, $this->baseUrl . $requestUrl, null, $options);
     }
 
     /**
