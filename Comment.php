@@ -4,7 +4,6 @@ namespace mirocow\zendesk;
 
 use mirocow\zendesk\common\baseModel;
 use Yii;
-use yii\base\Model;
 use yii\web\UploadedFile;
 
 /**
@@ -74,11 +73,7 @@ class Comment extends baseModel
             $this->validate();
         }
 
-        if(!empty($_FILES[$this->attachmentField]) && $_FILES[$this->attachmentField]['error'] <> 0) {
-            foreach ($_FILES[$this->attachmentField]['error'] as $key => $error) {
-                $this->attachmentFile($_FILES[$this->attachmentField]['tmp_name'][$key], $_FILES[$this->attachmentField]['name'][$key]);
-            }
-        }
+        $this->attachmentFiles();
 
         if ($this->id) {
             $text = $this->plain_body? $this->plain_body: $this->body;
@@ -101,6 +96,16 @@ class Comment extends baseModel
 
             return $this->id;
         }
+    }
+
+    public function attachmentFiles(){
+        if(!empty($_FILES[$this->attachmentField]) && $_FILES[$this->attachmentField]['error'] <> 0) {
+            foreach ($_FILES[$this->attachmentField]['error'] as $key => $error) {
+                $this->attachmentFile($_FILES[$this->attachmentField]['tmp_name'][$key], $_FILES[$this->attachmentField]['name'][$key]);
+            }
+        }
+
+        return $this;
     }
 
     protected function attachmentFile($filePath, $name = '')

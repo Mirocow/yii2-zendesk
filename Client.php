@@ -115,7 +115,11 @@ class Client extends Component
      */
     public function execute($method, $requestUrl, $options = [])
     {
-        return $this->httpClient->request($method, $this->baseUrl . $requestUrl, null, $options);
+        try {
+            return $this->httpClient->request($method, $this->baseUrl . $requestUrl, NULL, $options);
+        } catch (\Exception $e){
+            throw $e;
+        }
     }
 
     /**
