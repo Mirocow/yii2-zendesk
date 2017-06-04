@@ -30,6 +30,9 @@ class Comment extends baseModel
     public $uploads;
     public $attachmentField = 'files';
 
+    /**
+     * @return array
+     */
     public function rules()
     {
         return [
@@ -42,6 +45,9 @@ class Comment extends baseModel
         ];
     }
 
+    /**
+     * @return mixed
+     */
     public function getCreated()
     {
         return $this->created_at;
@@ -62,11 +68,18 @@ class Comment extends baseModel
         return $user;
     }
 
+    /**
+     *
+     */
     public function setPrivate()
     {
         Yii::$app->zendesk->put('tickets/'.$this->ticket_id.'/comments/'.$this->id.'/make_private.json');
     }
 
+    /**
+     * @param bool $runValidation
+     * @return mixed
+     */
     public function save($runValidation = true)
     {
         if ($runValidation) {
@@ -98,6 +111,9 @@ class Comment extends baseModel
         }
     }
 
+    /**
+     * @return $this
+     */
     public function attachmentFiles(){
         if(!empty($_FILES[$this->attachmentField]) && $_FILES[$this->attachmentField]['error'] <> 0) {
             foreach ($_FILES[$this->attachmentField]['error'] as $key => $error) {
@@ -108,6 +124,10 @@ class Comment extends baseModel
         return $this;
     }
 
+    /**
+     * @param $filePath
+     * @param string $name
+     */
     protected function attachmentFile($filePath, $name = '')
     {
         if(empty($filePath)){

@@ -95,16 +95,26 @@ class Ticket extends baseModel
     public function getRequester()
     {
         $data = Yii::$app->zendesk->get('/users/'.$this->requester_id.'.json');
+        if(empty($data['user'])){
+            return null;
+        }
+        /** @var User $user */
         $user = new Yii::$app->zendesk->userClass();
-        $user->load($data);
+        $user->load($data['user']);
         return $user;
     }
 
+    /**
+     * @return mixed
+     */
     public function getCreated()
     {
         return $this->created_at;
     }
 
+    /**
+     * @return mixed
+     */
     public function getUpdated()
     {
         return $this->updated_at;
@@ -141,6 +151,10 @@ class Ticket extends baseModel
 
     }
 
+    /**
+     * @param $text
+     * @return mixed
+     */
     public function addComment($text){
         /** @var Comment $comment */
         $comment = new Yii::$app->zendesk->commentClass;
