@@ -11,7 +11,7 @@ use yii\helpers\ArrayHelper;
  * @author Derushev Aleksey <derushev.alexey@gmail.com>
  * @author Mirocow <mr.mirocow@gmail.com>
  * @package mirocow\zendesk
- * https://developer.zendesk.com/rest_api/docs/core/search
+ * @see https://developer.zendesk.com/rest_api/docs/core/search
  */
 class Search extends Model
 {
@@ -49,9 +49,17 @@ class Search extends Model
         if ($this->validate()) {
             $query = [];
             if(is_array($this->query)) {
-                $query['query'] = urldecode(strtr(http_build_query($this->query), ['=' => ':', '&' => ' ']));
+                $parts = [];
+                foreach ($this->query as $fieldName => $part){
+                    if(is_array($part)){
+                        $parts[] = implode('', $part);
+                    } else {
+                        $parts[] = $fieldName . ':' . $part;
+                    }
+                }
+                $query['query'] = urldecode(implode(' ', $parts));
             } else {
-                $query['query'] = $this->query;
+                $query['query'] = urldecode($this->query);
             }
             $query = ArrayHelper::merge($query, $this->getAttributes(['type', 'sort_by', 'sort_order']));
             $response = Yii::$app->zendesk->get('/search.json', ['query' => $query]);

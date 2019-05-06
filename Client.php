@@ -11,7 +11,7 @@ use yii\helpers\Json;
  * @author Derushev Aleksey <derushev.alexey@gmail.com>
  * @author Mirocow <mr.mirocow@gmail.com>
  * @package mirocow\zendesk
- * based on manual: https://support.zendesk.com/hc/en-us/articles/203691216
+ * @see https://developer.zendesk.com/rest_api/docs/core/search
  */
 class Client extends Component
 {

@@ -123,12 +123,12 @@ class Ticket extends baseModel
     /**
      * @return mixed
      */
-    public function getComments($orderBy = [])
+    public function getComments($orderBy = [], $withImages = true)
     {
         if(!$orderBy){
             $orderBy = [
-              'sort_by' => 'created_at',
               'sort_order' => Search::SORT_DESC,
+              'include_inline_images' => $withImages
             ];
         }
 
